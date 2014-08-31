@@ -1,0 +1,28 @@
+label { 
+	display: inline-block; 
+	width: 140px; 
+	text-align: right; 
+	font: normal 13px/100% Verdana, Tahoma, sans-serif; 
+}
+
+input { 
+	padding: 9px; 
+    border: solid 1px #E5E5E5; 
+    width: 200px; 
+    padding: 9px 15px; 
+    border: 1; 
+    font-size: 13px; 
+}
+
+button{
+	float: right;
+	width: 75px; 
+	padding: 5px 10px;
+	font: normal 13px/100% Verdana, Tahoma, sans-serif; 
+}
+
+th
+{
+	border:1px solid black;
+	background: gray;
+}

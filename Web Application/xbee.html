@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Spark Core and XBee</title>
+    <link href="screen.css" rel="stylesheet">
+	<link href="onoff.css" rel="stylesheet">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+		var XBEEList = [];
+		var id = 0;
+		var isHeaderAdded = false;
+		
+		function addXBee() {
+			var xbee = new Array();
+			
+			id++;
+			
+			xbee["name"] = "xbee" + id;
+			xbee["addr64"] = document.getElementById("addr64").value;
+			xbee["addr16"] = "FFFF";
+			
+			var found = findXBee(xbee.name);
+			
+			if(!found){
+				XBEEList.push(xbee);
+				
+				if(!isHeaderAdded){
+					isHeaderAdded = true;
+					
+					addHeader();
+				}
+				
+				addToHTMLList(xbee, id);
+			}
+			
+			console.log("Array length " + XBEEList.length);
+        }
+		
+		function sendXBeeCommand(name, cmd, value){
+			console.log(name + " " + value);
+			var xbee = getXBee(name);
+			
+			sendCommand(xbee.addr64, xbee.addr16, cmd, value);
+		}
+		
+		function sendCommand(addr64, addr16, cmd, value){
+			var params = addr64 + "," + addr16 + "," + cmd + "=" + value;
+			
+			console.log(params);
+			
+			var deviceID = "<<deviceid>>";
+            var accessToken = "<<accesstoken>>";
+
+			console.log(params);
+            
+            $.post("https://api.spark.io/v1/devices/" + deviceID + "/sendcmd?access_token=" + accessToken,
+					{
+					    args: params
+					},
+					function (result) {
+					    console.log(result);
+					}
+			);
+		}
+		
+		function findXBee(name){
+			var found = false;
+			for(var index=0; index<XBEEList.length; ++index){
+				if(XBEEList[index].name == name){
+					console.log(XBEEList[index].name + "==" + name);
+					found = true;
+				
+					break
+				}
+			}
+			
+			return found;
+		}
+		
+		function getXBee(name){
+			var xbee = [];
+			for(var index=0; index<XBEEList.length; ++index){
+				if(XBEEList[index].name == name){
+					console.log(XBEEList[index].name + "==" + name);
+					xbee = XBEEList[index];
+					break
+				}
+			}
+			
+			return xbee;
+		}
+		
+		function addToHTMLList(xbee, id){
+			var parent = document.getElementById("xbeelisttable");
+			var row = document.createElement("tr");
+			
+			var tdaddr64 = document.createElement("td");
+			tdaddr64.innerHTML = xbee.addr64;
+			row.appendChild(tdaddr64);
+
+			var D0 = "<div class=\"checkboxFour\"><input type=\"checkbox\" value=\"1\" id=\"checkboxFourInputD0" + id + "\"name=\"\" onchange=\"sendXBeeCommand('" + xbee.name + "', 'D0', (this.checked ? '5' : '4'))\"/><label for=\"checkboxFourInputD0" + id + "\"></label></div>";
+			var D1 = "<div class=\"checkboxFour\"><input type=\"checkbox\" value=\"1\" id=\"checkboxFourInputD1" + id + "\"name=\"\" onchange=\"sendXBeeCommand('" + xbee.name + "', 'D1', (this.checked ? '5' : '4'))\"/><label for=\"checkboxFourInputD1" + id + "\"></label></div>";
+			var D2 = "<div class=\"checkboxFour\"><input type=\"checkbox\" value=\"1\" id=\"checkboxFourInputD2" + id + "\"name=\"\" onchange=\"sendXBeeCommand('" + xbee.name + "', 'D2', (this.checked ? '5' : '4'))\"/><label for=\"checkboxFourInputD2" + id + "\"></label></div>";
+			var D3 = "<div class=\"checkboxFour\"><input type=\"checkbox\" value=\"1\" id=\"checkboxFourInputD3" + id + "\"name=\"\" onchange=\"sendXBeeCommand('" + xbee.name + "', 'D3', (this.checked ? '5' : '4'))\"/><label for=\"checkboxFourInputD3" + id + "\"></label></div>";
+			
+			console.log(D0);
+			console.log(D1);
+			console.log(D2);
+			console.log(D3);
+		
+			var d0 = document.createElement("td");
+			d0.innerHTML =  D0;
+			row.appendChild(d0);
+			
+			var d1 = document.createElement("td");
+			d1.innerHTML =  D1;
+			row.appendChild(d1);
+			
+			var d2 = document.createElement("td");
+			d2.innerHTML =  D2;
+			row.appendChild(d2);
+			
+			var d3 = document.createElement("td");
+			d3.innerHTML =  D3;
+			row.appendChild(d3);
+			
+			parent.appendChild(row);
+		}
+		
+		function addHeader(){
+			var parent = document.getElementById("xbeelisttable");
+			var row = document.createElement("tr");
+			
+			var name = document.createElement("th");
+			name.innerHTML = "Name";
+			row.appendChild(name);
+			
+			var D0 = document.createElement("th");
+			D0.innerHTML = "D0";
+			row.appendChild(D0);
+			
+			var D1 = document.createElement("th");
+			D1.innerHTML = "D1";
+			row.appendChild(D1);
+			
+			var D1 = document.createElement("th");
+			D1.innerHTML = "D2";
+			row.appendChild(D1);
+			
+			var D3 = document.createElement("th");
+			D3.innerHTML = "D3";
+			row.appendChild(D3);
+			
+			parent.appendChild(row);
+		}
+	</script>
+</head>
+<body>
+    <h2><b><u>Spark Core RF Communication using XBee</u></b></h2>
+	<p>This is a demo using Spark Core and XBee. To run this demo enter the 64-bit address of the remote XBee and 
+	   press 'Add' button. For this demo it is assumed that the remote XBee's D0, D1, D2 and D3 is connected. Once it is added, then you can turn on/off the D0, D1, D2 and D3 pins of the XBee.
+	   If you want to control all XBee(s), then enter the broadcast address 000000000000FFFF.</p>
+	
+	<br>
+	
+    <table>
+        <tr>
+			<td>
+                <label for="addr64">64-bit Address:</label>
+            </td>
+            <td>
+                <input type="text" name="addr64" id="addr64"/>
+            </td>
+			<td>
+                <button onclick="addXBee()">Add</button>
+            </td>
+        </tr>
+    </table>
+	<hr>
+	<table id="xbeelisttable">
+		
+	</table>
+</body>
+</html>
